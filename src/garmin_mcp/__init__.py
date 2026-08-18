@@ -487,7 +487,8 @@ def main():
                         "Server misconfigured: GARMIN_MCP_API_KEY not set",
                         status_code=500,
                     )
-                if request.headers.get("x-api-key") != expected_key:
+                provided_key = request.headers.get("x-api-key") or request.query_params.get("key")
+                if provided_key != expected_key:
                     return PlainTextResponse("Unauthorized", status_code=401)
                 return await call_next(request)
 
