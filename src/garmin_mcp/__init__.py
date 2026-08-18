@@ -468,7 +468,32 @@ def main():
         )
 
     # Run the MCP server
-    app.run(transport=transport)
+        # Run the MCP server
+    if transport == "stdio":
+        app.run(transport=transport)
+    else:
+        import uvicorn
+        from starlette.middleware.base import BaseHTTPMiddleware
+        from starlette.responses import PlainTextResponse
+
+        expected_key = os.getenv("GARMIN_MCP_API_KEY")
+
+        class ApiKeyMiddleware(BaseHTTPMiddleware):
+            async def dispatch(self, request, call_next):
+                if request.url.path == "/healthz":
+                    return await call_next(request)
+                if not expected_key:
+                    return PlainTextResponse(
+                        "Server misconfigured: GARMIN_MCP_API_KEY not set",
+                        status_code=500,
+                    )
+                if request.headers.get("x-api-key") != expected_key:
+                    return PlainTextResponse("Unauthorized", status_code=401)
+                return await call_next(request)
+
+        http_app = fastmcp.streamable_http_app()
+        http_app.add_middleware(ApiKeyMiddleware)
+        uvicorn.run(http_app, host=http_host, port=http_port)
 
 
 if __name__ == "__main__":
