@@ -34,10 +34,14 @@ RUN mkdir -p /root/.garminconnect && \
 
 # Expose the HTTP port. The image defaults to stdio (Claude Desktop, Inspector);
 # set GARMIN_MCP_TRANSPORT=streamable-http to serve over this port (e.g. in k8s).
-# EXPOSE 8000
+EXPOSE 8000
+
+# Copy and prepare the startup script
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 # Set the entrypoint to run the MCP server
-ENTRYPOINT ["garmin-mcp"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 # Health check (optional - adjust based on your needs)
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
