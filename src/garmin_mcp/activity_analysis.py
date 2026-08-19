@@ -840,7 +840,7 @@ def _parse_fit(fit_bytes: bytes, include_records: bool) -> dict:
                 "power_w": _get_field(message, "power"),
                 "cadence_rpm": cadence,
                 "heart_rate_bpm": _get_field(message, "heart_rate"),
-                "speed_mps": _get_field(message, "speed"),
+                "speed_mps": _get_field(message, "enhanced_speed", "speed"),
                 "altitude_m": _get_field(message, "altitude"),
                 "grade_pct": grade,
                 "temperature_c": _get_field(message, "temperature"),
