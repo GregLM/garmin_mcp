@@ -480,15 +480,17 @@ def main():
 
         class ApiKeyMiddleware(BaseHTTPMiddleware):
             async def dispatch(self, request, call_next):
-                if request.url.path == "/healthz":
+                if not request.url.path.startswith("/mcp"):
                     return await call_next(request)
                 if not expected_key:
                     return PlainTextResponse(
                         "Server misconfigured: GARMIN_MCP_API_KEY not set",
                         status_code=500,
                     )
-                provided_key = request.headers.get("x-api-key") or request.query_params.get("key")
-                if provided_key != expected_key:
+                if (
+                    request.headers.get("x-api-key")
+                    or request.query_params.get("key")
+                ) != expected_key:
                     return PlainTextResponse("Unauthorized", status_code=401)
                 return await call_next(request)
 
