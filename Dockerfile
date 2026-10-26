@@ -38,6 +38,7 @@ EXPOSE 8000
 
 # Copy and prepare the startup script
 COPY entrypoint.sh ./entrypoint.sh
+COPY token_sync.py ./token_sync.py
 RUN chmod +x entrypoint.sh
 
 # Set the entrypoint to run the MCP server
